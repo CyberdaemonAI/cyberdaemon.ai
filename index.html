@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="AI security research, DIRA, agentic AI, AI governance, behavioral authorization, AI evaluation, non-human identity, NHI, zero trust AI, agentic identity, runtime authorization">
+  <meta name="description" content="Original research on agentic AI authorization, governance framework analysis, and AI evaluation methodology. Independent. No vendor affiliation.">
+  <link rel="canonical" href="https://cyberdaemon.ai">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cyberdaemon.ai">
+  <meta property="og:title" content="cyberdaemon.ai — Independent AI Security Research">
+  <meta property="og:description" content="Original research on agentic AI authorization, governance framework analysis, and AI evaluation methodology. Independent. No vendor affiliation.">
+  <meta property="og:site_name" content="cyberdaemon.ai">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="cyberdaemon.ai — Independent AI Security Research">
+  <meta name="twitter:description" content="Original research on agentic AI authorization, governance framework analysis, and AI evaluation methodology. Independent. No vendor affiliation.">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "cyberdaemon.ai",
+    "description": "Independent AI security research covering agentic authorization, governance framework analysis, AI evaluation methodology, and behavioral authorization.",
+    "url": "https://cyberdaemon.ai",
+    "publisher": {
+      "@type": "Organization",
+      "name": "cyberdaemon.ai",
+      "url": "https://cyberdaemon.ai"
+    },
+    "keywords": ["AI security research", "DIRA", "agentic AI", "behavioral authorization", "AI governance", "AI evaluation", "non-human identity", "runtime authorization"]
+  }
+  </script>
+  <title>cyberdaemon.ai — Independent AI Security Research</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-0:          #0d1117;
+      --bg-1:          #161b22;
+      --bg-2:          #1c2128;
+      --bg-3:          #21262d;
+      --border:        #30363d;
+      --border-light:  #21262d;
+      --accent:        #58a6ff;
+      --accent-dim:    rgba(88, 166, 255, 0.12);
+      --accent-glow:   rgba(88, 166, 255, 0.08);
+
+      /* Property accent colors */
+      --gov:           #3fb950;
+      --gov-dim:       rgba(63, 185, 80, 0.10);
+      --harness:       #d29922;
+      --harness-dim:   rgba(210, 153, 34, 0.10);
+      --identity:      #58a6ff;
+      --identity-dim:  rgba(88, 166, 255, 0.10);
+      --dira:          #bc8cff;
+      --dira-dim:      rgba(188, 140, 255, 0.10);
+
+      --text:          #e6edf3;
+      --text-muted:    #8b949e;
+      --text-dim:      #6e7681;
+
+      --font-serif:    Georgia, 'Times New Roman', serif;
+      --font-sans:     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      --font-mono:     'Courier New', Courier, monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-0);
+      color: var(--text);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+
+    p { color: var(--text); }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 17, 23, 0.93);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+    }
+
+    .nav-brand {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: 0.01em;
+    }
+
+    .nav-brand span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 96px 0 80px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 48px);
+      color: var(--text);
+      margin-bottom: 20px;
+      max-width: 720px;
+    }
+
+    .hero-body {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--text);
+      max-width: 640px;
+    }
+
+    /* ── SECTION HEADINGS ── */
+    .section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(20px, 2.5vw, 28px);
+      color: var(--text);
+      margin-bottom: 40px;
+    }
+
+    /* ── PROPERTY CARDS ── */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+      gap: 20px;
+    }
+
+    @media (max-width: 980px) {
+      .cards { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 28px 32px;
+      position: relative;
+      transition: border-color 0.15s;
+    }
+
+    .card:hover { border-color: #484f58; }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      border-radius: 6px 6px 0 0;
+    }
+
+    .card-gov::before    { background: var(--gov); }
+    .card-harness::before { background: var(--harness); }
+    .card-identity::before { background: var(--identity); }
+    .card-dira::before   { background: var(--dira); }
+
+    .card-gov    { background: linear-gradient(160deg, rgba(63,185,80,0.05) 0%, var(--bg-1) 60%); }
+    .card-harness { background: linear-gradient(160deg, rgba(210,153,34,0.05) 0%, var(--bg-1) 60%); }
+    .card-identity { background: linear-gradient(160deg, rgba(88,166,255,0.05) 0%, var(--bg-1) 60%); }
+    .card-dira   { background: linear-gradient(160deg, rgba(188,140,255,0.05) 0%, var(--bg-1) 60%); }
+
+    .card-subdomain {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .card-gov .card-subdomain    { color: var(--gov); }
+    .card-harness .card-subdomain { color: var(--harness); }
+    .card-identity .card-subdomain { color: var(--identity); }
+    .card-dira .card-subdomain   { color: var(--dira); }
+
+    .card h3 {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    .card-what {
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 6px;
+      line-height: 1.55;
+    }
+
+    .card-who {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      line-height: 1.55;
+    }
+
+    .card-link {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .card-gov .card-link    { color: var(--gov); }
+    .card-harness .card-link { color: var(--harness); }
+    .card-identity .card-link { color: var(--identity); }
+    .card-dira .card-link   { color: var(--dira); }
+
+    /* ── ABOUT ── */
+    .about-body {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 720px;
+    }
+
+    .about-body p {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--text);
+    }
+
+    /* ── ROUTER ── */
+    .router-wrap {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 36px 40px;
+      max-width: 680px;
+    }
+
+    .router-step {
+      margin-bottom: 28px;
+    }
+
+    .router-step:last-of-type { margin-bottom: 0; }
+
+    .router-q {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .router-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .router-btn {
+      font-family: var(--font-sans);
+      font-size: 13px;
+      color: var(--text);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 7px 14px;
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .router-btn:hover {
+      border-color: #484f58;
+      background: var(--bg-3);
+    }
+
+    .router-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .router-result {
+      margin-top: 28px;
+      padding: 20px 24px;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      display: none;
+    }
+
+    .router-result.visible { display: block; }
+
+    .router-result-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .router-result-dest {
+      font-size: 16px;
+      font-family: var(--font-serif);
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .router-result-note {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .router-result a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* ── UPDATE FEED ── */
+    .feed-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .feed-item {
+      display: grid;
+      grid-template-columns: 90px 100px 1fr;
+      gap: 16px;
+      align-items: baseline;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .feed-item:last-child { border-bottom: none; }
+
+    .feed-date {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .feed-tag {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .tag-gov      { color: var(--gov); }
+    .tag-harness  { color: var(--harness); }
+    .tag-identity { color: var(--identity); }
+    .tag-dira     { color: var(--dira); }
+
+    .feed-desc {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .feed-item {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .footer-brand {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .footer-disclaimer {
+      font-size: 12px;
+      color: var(--text-dim);
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 60px 0 48px; }
+      .section { padding: 48px 0; }
+      .router-wrap { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <div class="nav-brand">cyberdaemon<span>.ai</span></div>
+        <ul class="nav-links">
+          <li><a href="#research">Research</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#start">Where to start</a></li>
+          <li><a href="#updates">Updates</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero-label">cyberdaemon.ai</p>
+      <h1>Independent AI security research. No vendor affiliation. No agenda.</h1>
+      <p class="hero-body">This is original work on agentic AI authorization, governance framework coverage, and AI evaluation methodology. It exists because most AI security content is produced by vendors with something to sell or frameworks with something to protect. This is neither.</p>
+    </div>
+  </section>
+
+  <!-- RESEARCH PROPERTIES -->
+  <section class="section" id="research">
+    <div class="container">
+      <p class="section-label">Research properties</p>
+      <h2 class="section-title">Four active research areas</h2>
+      <div class="cards">
+
+        <!-- Governance -->
+        <div class="card card-gov">
+          <p class="card-subdomain">governance.cyberdaemon.ai</p>
+          <h3>AI Governance Framework Navigator</h3>
+          <p class="card-what">26 AI governance frameworks mapped — coverage matrix, NHI gap analysis, and behavioral authorization gaps across NIST, EU AI Act, OWASP AISVS, MITRE ATLAS, and more.</p>
+          <p class="card-who">For practitioners who need to know what frameworks actually cover, and what they miss.</p>
+          <a class="card-link" href="https://governance.cyberdaemon.ai">Visit &rarr;</a>
+        </div>
+
+        <!-- Harnesses -->
+        <div class="card card-harness">
+          <p class="card-subdomain">harnesses.cyberdaemon.ai</p>
+          <h3>AI Evaluation Harness Explainer</h3>
+          <p class="card-what">How to build evaluation pipelines for LLMs and agentic systems. 200/300/400 learning levels, from concepts to implementation patterns.</p>
+          <p class="card-who">For engineers building or evaluating AI systems who need more than benchmark comparisons.</p>
+          <a class="card-link" href="https://harnesses.cyberdaemon.ai">Visit &rarr;</a>
+        </div>
+
+        <!-- Identity -->
+        <div class="card card-identity">
+          <p class="card-subdomain">identity.cyberdaemon.ai</p>
+          <h3>Securing Agentic Identity</h3>
+          <p class="card-what">Commercial platforms (Bedrock, Copilot, Vertex), open standards (SPIFFE/SPIRE, A2A), and the behavioral authorization gap — with reference architectures.</p>
+          <p class="card-who">For security architects and platform engineers working on AI deployments, not just theory.</p>
+          <a class="card-link" href="https://identity.cyberdaemon.ai">Visit &rarr;</a>
+        </div>
+
+        <!-- DIRA -->
+        <div class="card card-dira">
+          <p class="card-subdomain">dira.cyberdaemon.ai</p>
+          <h3>DIRA: Dual-Intent Runtime Authorization</h3>
+          <p class="card-what">Original research on per-request behavioral authorization for autonomous agents. What RBAC and ABAC miss, and what a runtime control point actually requires.</p>
+          <p class="card-who">For practitioners who need enforcement mechanisms, not just audit trails.</p>
+          <a class="card-link" href="https://dira.cyberdaemon.ai">Visit &rarr;</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="container">
+      <p class="section-label">About this platform</p>
+      <h2 class="section-title">What this is</h2>
+      <div class="about-body">
+        <p>Most AI security content is vendor-produced or framework-captured. Vendors have products to position. Standards bodies have constituencies to balance. The result is content that is often accurate on what frameworks say and thin on what practitioners actually need to know. This platform publishes independent analysis, with no product to recommend and no sponsorship to protect.</p>
+        <p>Independent here means no consulting engagements, no vendor relationships influencing the content, and no client work. The research is published under cyberdaemon.ai. It is not affiliated with or endorsed by any employer, standards body, or vendor. Views expressed are the author's own.</p>
+        <p>DIRA, Dual-Intent Runtime Authorization, is the core original contribution and the research thread this platform was built around. The premise: existing access control models (RBAC, ABAC, policy-as-code) were designed for human principals making discrete, observable requests. Autonomous agents are different. They take sequences of actions, accumulate permissions across a session, and can diverge from stated intent without triggering any existing control. DIRA is a framework for enforcing behavioral authorization at runtime, per request, across the full action sequence. The other properties extend from that core problem.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHERE TO START -->
+  <section class="section" id="start">
+    <div class="container">
+      <p class="section-label">Interactive</p>
+      <h2 class="section-title">Where do I start?</h2>
+      <div class="router-wrap">
+
+        <div class="router-step" id="step-role">
+          <p class="router-q">Q1 — What is your role?</p>
+          <div class="router-options">
+            <button class="router-btn" data-step="role" data-val="architect">Security architect</button>
+            <button class="router-btn" data-step="role" data-val="engineer">Engineer</button>
+            <button class="router-btn" data-step="role" data-val="exec">CISO / executive</button>
+            <button class="router-btn" data-step="role" data-val="researcher">Researcher</button>
+          </div>
+        </div>
+
+        <div class="router-step" id="step-problem">
+          <p class="router-q">Q2 — What is your main problem?</p>
+          <div class="router-options">
+            <button class="router-btn" data-step="problem" data-val="eval">Evaluating AI systems</button>
+            <button class="router-btn" data-step="problem" data-val="gov">Governance / compliance</button>
+            <button class="router-btn" data-step="problem" data-val="identity">Securing agent identities</button>
+            <button class="router-btn" data-step="problem" data-val="auth">Behavioral authorization</button>
+          </div>
+        </div>
+
+        <div class="router-step" id="step-depth">
+          <p class="router-q">Q3 — How much AI security experience?</p>
+          <div class="router-options">
+            <button class="router-btn" data-step="depth" data-val="intro">Getting started</button>
+            <button class="router-btn" data-step="depth" data-val="mid">Some experience</button>
+            <button class="router-btn" data-step="depth" data-val="deep">Deep practitioner</button>
+          </div>
+        </div>
+
+        <div class="router-result" id="router-result">
+          <p class="router-result-label">Recommendation</p>
+          <p class="router-result-dest" id="result-dest"></p>
+          <p class="router-result-note" id="result-note"></p>
+          <a id="result-link" href="#"></a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- UPDATE FEED -->
+  <section class="section" id="updates">
+    <div class="container">
+      <p class="section-label">Platform updates</p>
+      <h2 class="section-title">Recent activity</h2>
+      <ul class="feed-list">
+        <li class="feed-item">
+          <span class="feed-date">2026-06-16</span>
+          <span class="feed-tag tag-dira">DIRA</span>
+          <span class="feed-desc">Initial publication of DIRA: Dual-Intent Runtime Authorization framework and threat model</span>
+        </li>
+        <li class="feed-item">
+          <span class="feed-date">2026-06-16</span>
+          <span class="feed-tag tag-identity">Identity</span>
+          <span class="feed-desc">Securing Agentic Identity published — commercial platform analysis, SPIFFE/A2A coverage, reference architectures</span>
+        </li>
+        <li class="feed-item">
+          <span class="feed-date">2026-06-16</span>
+          <span class="feed-tag tag-gov">Governance</span>
+          <span class="feed-desc">AI Governance Framework Navigator live — 26 frameworks, NHI gap analysis, behavioral authorization coverage matrix</span>
+        </li>
+        <li class="feed-item">
+          <span class="feed-date">2026-06-16</span>
+          <span class="feed-tag tag-harness">Harnesses</span>
+          <span class="feed-desc">AI Evaluation Harness Explainer published — 200/300/400 levels, pipeline architecture, agentic evaluation patterns</span>
+        </li>
+        <li class="feed-item">
+          <span class="feed-date">2026-06-16</span>
+          <span class="feed-tag tag-dira">Platform</span>
+          <span class="feed-desc">cyberdaemon.ai launched as independent AI security research hub</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <p class="footer-brand">cyberdaemon.ai &mdash; independent AI security research</p>
+        <p class="footer-disclaimer">Views are the author's own. Not affiliated with or endorsed by any employer, standards body, or vendor.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const state = { role: null, problem: null, depth: null };
+
+      // Routing table: [role, problem, depth] -> { dest, note, url }
+      function recommend(role, problem, depth) {
+        // Problem is the primary signal; role and depth refine
+        if (problem === 'eval') {
+          if (depth === 'intro') return {
+            dest: 'AI Evaluation Harness Explainer',
+            note: 'Start at the 200-level — it builds the mental model before diving into pipeline architecture.',
+            url: 'https://harnesses.cyberdaemon.ai'
+          };
+          return {
+            dest: 'AI Evaluation Harness Explainer',
+            note: 'The 300 and 400 levels cover agentic evaluation patterns and behavioral test design. Skip the 200 overview if you already know the basics.',
+            url: 'https://harnesses.cyberdaemon.ai'
+          };
+        }
+        if (problem === 'gov') {
+          if (role === 'exec') return {
+            dest: 'AI Governance Framework Navigator',
+            note: 'The NHI gap analysis and framework comparison table are the fastest way to understand where current frameworks fall short.',
+            url: 'https://governance.cyberdaemon.ai'
+          };
+          return {
+            dest: 'AI Governance Framework Navigator',
+            note: '26 frameworks mapped with full coverage matrices. Start with the gap analysis — it tells you what none of them address.',
+            url: 'https://governance.cyberdaemon.ai'
+          };
+        }
+        if (problem === 'identity') {
+          if (depth === 'deep') return {
+            dest: 'Securing Agentic Identity',
+            note: 'Go straight to the reference architectures and the behavioral authorization gap section. The commercial platform analysis is the most current independent comparison available.',
+            url: 'https://identity.cyberdaemon.ai'
+          };
+          return {
+            dest: 'Securing Agentic Identity',
+            note: 'Covers commercial platforms (Bedrock, Copilot, Vertex), open standards (SPIFFE/SPIRE, A2A), and where all of them stop short.',
+            url: 'https://identity.cyberdaemon.ai'
+          };
+        }
+        if (problem === 'auth') {
+          return {
+            dest: 'DIRA: Dual-Intent Runtime Authorization',
+            note: 'This is the core research thread. Start with the threat model — it explains why existing control models fail for autonomous agents before introducing the DIRA framework.',
+            url: 'https://dira.cyberdaemon.ai'
+          };
+        }
+        // Fallback by role
+        const fallbacks = {
+          architect: { dest: 'Securing Agentic Identity', note: 'Reference architectures and the NHI gap are the fastest path to actionable design guidance.', url: 'https://identity.cyberdaemon.ai' },
+          engineer:  { dest: 'AI Evaluation Harness Explainer', note: 'Evaluation pipeline architecture and agentic test design — practical and implementation-focused.', url: 'https://harnesses.cyberdaemon.ai' },
+          exec:      { dest: 'AI Governance Framework Navigator', note: 'Framework coverage matrix gives you an accurate picture of the governance landscape without vendor framing.', url: 'https://governance.cyberdaemon.ai' },
+          researcher:{ dest: 'DIRA: Dual-Intent Runtime Authorization', note: 'Original research on the behavioral authorization gap — the most novel contribution on this platform.', url: 'https://dira.cyberdaemon.ai' }
+        };
+        return fallbacks[role] || { dest: 'AI Governance Framework Navigator', note: 'A good starting point regardless of background.', url: 'https://governance.cyberdaemon.ai' };
+      }
+
+      function updateResult() {
+        if (!state.role || !state.problem || !state.depth) return;
+        const rec = recommend(state.role, state.problem, state.depth);
+        document.getElementById('result-dest').textContent = rec.dest;
+        document.getElementById('result-note').textContent = rec.note;
+        const link = document.getElementById('result-link');
+        link.href = rec.url;
+        link.textContent = 'Go there \u2192';
+        const result = document.getElementById('router-result');
+        result.classList.add('visible');
+        result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      document.querySelectorAll('.router-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const step = btn.dataset.step;
+          const val  = btn.dataset.val;
+          // Deselect siblings
+          document.querySelectorAll('[data-step="' + step + '"]').forEach(function (b) {
+            b.classList.remove('selected');
+          });
+          btn.classList.add('selected');
+          state[step] = val;
+          updateResult();
+        });
+      });
+    }());
+  </script>
+
+</body>
+</html>
