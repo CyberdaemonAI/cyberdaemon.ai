@@ -31,7 +31,28 @@
       --nav-bg: rgba(249, 248, 246, 0.95);
     }
 
+    [data-theme="dark"]
+      :root {
+        --teal: #00c8a0;
+        --teal-light: #00e6b8;
+        --gold: #c9a84c;
+        --gold-light: #e0c060;
+
+        --bg: #111210;
+        --bg-surface: #1a1917;
+        --bg-rule: #2e2c29;
+        --text: #e8e5de;
+        --text-secondary: #b0ada6;
+        --text-muted: #706e68;
+        --link: var(--teal);
+        --link-hover: var(--teal-light);
+        --code-bg: #21201e;
+        --callout-bg: #162420;
+        --callout-border: var(--teal);
+        --nav-bg: rgba(17, 18, 16, 0.95);
+      }
     @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"])
       :root {
         --teal: #00c8a0;
         --teal-light: #00e6b8;
@@ -521,6 +542,19 @@
       color: var(--teal);
       border-left-color: var(--teal);
     }
+  
+    .theme-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-family: var(--font-ui);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-left: 1rem;
+    }
+    .theme-btn:hover { color: var(--teal); border-color: var(--teal); }
   </style>
 </head>
 <body>
@@ -542,7 +576,8 @@
       </ul>
       <a href="https://github.com/CyberdaemonAI" class="topnav-github" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
-  </nav>
+    <button class="theme-btn" id="theme-toggle" aria-label="Toggle theme">Light</button>
+</nav>
 
   <!-- ─── Layout ─── -->
   <div class="layout">
@@ -750,5 +785,22 @@
     })();
   </script>
 
+<script>
+  (function() {
+    var btn = document.getElementById('theme-toggle');
+    var saved = localStorage.getItem('theme');
+    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var current = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', current);
+    if (btn) btn.textContent = current === 'dark' ? 'Light' : 'Dark';
+
+    if (btn) btn.addEventListener('click', function() {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      btn.textContent = next === 'dark' ? 'Light' : 'Dark';
+    });
+  })();
+</script>
 </body>
 </html>
