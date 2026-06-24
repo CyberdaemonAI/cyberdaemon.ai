@@ -595,7 +595,7 @@
           <h3>AI Governance Framework Navigator</h3>
           <p class="card-what">26 AI governance frameworks mapped — coverage matrix, NHI gap analysis, and behavioral authorization gaps across NIST, EU AI Act, OWASP AISVS, MITRE ATLAS, and more.</p>
           <p class="card-who">For practitioners who need to know what frameworks actually cover, and what they miss.</p>
-          <a class="card-link" href="https://ai-ai-governance.cyberdaemon.ai">Visit &rarr;</a>
+          <a class="card-link" href="https://ai-governance.cyberdaemon.ai">Visit &rarr;</a>
         </div>
 
         <!-- Harnesses -->
@@ -757,12 +757,12 @@
           if (role === 'exec') return {
             dest: 'AI Governance Framework Navigator',
             note: 'The NHI gap analysis and framework comparison table are the fastest way to understand where current frameworks fall short.',
-            url: 'https://ai-ai-governance.cyberdaemon.ai'
+            url: 'https://ai-governance.cyberdaemon.ai'
           };
           return {
             dest: 'AI Governance Framework Navigator',
             note: '26 frameworks mapped with full coverage matrices. Start with the gap analysis — it tells you what none of them address.',
-            url: 'https://ai-ai-governance.cyberdaemon.ai'
+            url: 'https://ai-governance.cyberdaemon.ai'
           };
         }
         if (problem === 'identity') {
@@ -788,10 +788,10 @@
         const fallbacks = {
           architect: { dest: 'Securing Agentic Identity', note: 'Reference architectures and the NHI gap are the fastest path to actionable design guidance.', url: 'https://identity.cyberdaemon.ai' },
           engineer:  { dest: 'AI Evaluation Harness Explainer', note: 'Evaluation pipeline architecture and agentic test design — practical and implementation-focused.', url: 'https://harnesses.cyberdaemon.ai' },
-          exec:      { dest: 'AI Governance Framework Navigator', note: 'Framework coverage matrix gives you an accurate picture of the governance landscape without vendor framing.', url: 'https://ai-ai-governance.cyberdaemon.ai' },
+          exec:      { dest: 'AI Governance Framework Navigator', note: 'Framework coverage matrix gives you an accurate picture of the governance landscape without vendor framing.', url: 'https://ai-governance.cyberdaemon.ai' },
           researcher:{ dest: 'DIRA: Dual-Intent Runtime Authorization', note: 'Original research on the behavioral authorization gap — the most novel contribution on this platform.', url: 'https://dira.cyberdaemon.ai' }
         };
-        return fallbacks[role] || { dest: 'AI Governance Framework Navigator', note: 'A good starting point regardless of background.', url: 'https://ai-ai-governance.cyberdaemon.ai' };
+        return fallbacks[role] || { dest: 'AI Governance Framework Navigator', note: 'A good starting point regardless of background.', url: 'https://ai-governance.cyberdaemon.ai' };
       }
 
       function updateResult() {
