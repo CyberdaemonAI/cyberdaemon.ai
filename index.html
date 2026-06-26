@@ -404,26 +404,6 @@
     .key-finding p { font-size: 0.92rem; color: var(--text-secondary); }
     .key-finding p:last-child { margin-bottom: 0; }
 
-    /* ─── SPIFFE explainer ─── */
-    .spiffe-section h2 { margin-top: 0; }
-
-    .spec-block {
-      background: var(--code-bg);
-      border: 1px solid var(--bg-rule);
-      border-radius: 4px;
-      padding: 0.85rem 1.1rem;
-      margin: 1.25rem 0;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.82rem;
-      color: var(--teal);
-      line-height: 1.6;
-    }
-
-    .spec-block .comment {
-      color: var(--text-muted);
-      font-style: normal;
-    }
-
     /* ─── Updates feed ─── */
     .updates-list {
       list-style: none;
@@ -538,7 +518,7 @@
         <li><span class="sep" aria-hidden="true">·</span></li>
         <li><a href="https://dira.cyberdaemon.ai" target="_blank" rel="noopener">DIRA</a></li>
         <li><span class="sep" aria-hidden="true">·</span></li>
-        <li><a href="#spiffe">SPIFFE/SPIRE</a></li>
+        <li><a href="https://spiffe.cyberdaemon.ai" target="_blank" rel="noopener">SPIFFE/SPIRE</a></li>
       </ul>
       <a href="https://github.com/CyberdaemonAI" class="topnav-github" target="_blank" rel="noopener">GitHub ↗</a>
     </div>
@@ -557,7 +537,7 @@
         <li class="sub"><a href="https://harnesses.cyberdaemon.ai" class="sub" target="_blank" rel="noopener">Harnesses</a></li>
         <li class="sub"><a href="https://identity.cyberdaemon.ai" class="sub" target="_blank" rel="noopener">Agentic Identity</a></li>
         <li class="sub"><a href="https://dira.cyberdaemon.ai" class="sub" target="_blank" rel="noopener">DIRA</a></li>
-        <li><a href="#spiffe">SPIFFE/SPIRE</a></li>
+        <li class="sub"><a href="https://spiffe.cyberdaemon.ai" class="sub" target="_blank" rel="noopener">SPIFFE/SPIRE</a></li>
         <li><a href="#updates">Updates</a></li>
       </ul>
     </aside>
@@ -579,6 +559,7 @@
         <span class="section-eyebrow">Research</span>
         <h2>Properties</h2>
         <p>Five research properties, each focused on a distinct problem domain in AI security and identity. Each publishes independently at its own subdomain.</p>
+        <!-- Five properties: Governance, Harnesses, Identity, DIRA, SPIFFE/SPIRE -->
 
         <ul class="property-list" role="list">
           <li>
@@ -611,79 +592,12 @@
           </li>
           <li>
             <span class="property-name">
-              <a href="#spiffe">SPIFFE/SPIRE and Workload Identity</a>
+              <a href="https://spiffe.cyberdaemon.ai" target="_blank" rel="noopener">SPIFFE/SPIRE and Workload Identity</a>
             </span>
-            <span class="property-tag">on this page ↓</span>
-            <p class="property-desc">An explainer on SPIFFE, SPIRE, and the CNCF workload identity stack as it applies to AI agents. Covers the standard in depth — SVIDs, trust domains, attestation, federation — and why this matters specifically for agentic systems operating across distributed infrastructure.</p>
+            <span class="property-tag">spiffe.cyberdaemon.ai</span>
+            <p class="property-desc">An in-depth technical explainer on SPIFFE, SPIRE, and the CNCF workload identity stack as it applies to AI agents. Covers the standard in depth: SVIDs, trust domains, attestation, federation, implementation patterns, and why cryptographic workload identity is the non-negotiable baseline for agentic systems operating at scale.</p>
           </li>
         </ul>
-      </section>
-
-      <!-- ─── SPIFFE/SPIRE explainer ─── -->
-      <section id="spiffe" class="spiffe-section">
-        <span class="section-eyebrow">Explainer</span>
-        <h2>SPIFFE, SPIRE, and Workload Identity</h2>
-
-        <p>Most identity systems were designed for humans. They assume a principal that can authenticate with a password, accept a push notification, or click a link. AI agents break this assumption. A model running inside a container on a Kubernetes cluster cannot enroll in MFA. It does not have a browser session. The question of how to establish trustworthy, verifiable identity for non-human workloads is one of the foundational problems in agentic AI security — and SPIFFE is the standard that answers it.</p>
-
-        <h2>What SPIFFE is</h2>
-
-        <p>SPIFFE stands for Secure Production Identity Framework For Everyone. It is a CNCF-graduated standard, not a product. SPIFFE defines a common vocabulary and set of specifications for issuing cryptographic identities to workloads running in dynamic, heterogeneous infrastructure. The goal is to give any process — a container, a VM, a serverless function, an AI agent — a verifiable identity that does not depend on network location, static secrets, or manual provisioning.</p>
-
-        <p>The identity itself is expressed as a SPIFFE ID: a URI following the format <code>spiffe://trust-domain/path</code>. The trust domain is the administrative boundary — analogous to a DNS zone but for identity issuance. The path encodes the workload's location within that domain.</p>
-
-        <div class="spec-block">
-          <span class="comment"># Examples of SPIFFE IDs</span><br>
-          spiffe://prod.example.com/agent/payment-processor<br>
-          spiffe://research.internal/model/inference-worker<br>
-          spiffe://ai-platform.org/orchestrator/task-router
-        </div>
-
-        <p>SPIFFE IDs appear inside SVIDs — SPIFFE Verifiable Identity Documents. There are two SVID formats, and they serve different purposes.</p>
-
-        <h2>SVIDs: X.509 vs JWT</h2>
-
-        <p>An <strong>X.509-SVID</strong> embeds the SPIFFE ID in the Subject Alternative Name field of a standard X.509 certificate. The private key stays on the workload; the certificate is the proof of identity. X.509-SVIDs are the right choice for service-to-service mTLS, where both sides authenticate each other at the transport layer. Because X.509 certificates are well-understood by TLS stacks, X.509-SVIDs integrate cleanly with existing infrastructure.</p>
-
-        <p>A <strong>JWT-SVID</strong> is a signed JSON Web Token carrying the SPIFFE ID as the <code>sub</code> claim. JWT-SVIDs are short-lived bearer tokens useful when transport-layer mTLS is not available or practical — cross-layer authentication, HTTP-based APIs, or systems where the identity needs to traverse a service mesh boundary. The tradeoff is that JWTs are bearer tokens: possession equals identity, so short expiry and strict audience binding are essential.</p>
-
-        <div class="callout">
-          <div class="callout-label">When to use which</div>
-          <p>Use X.509-SVIDs when you control both ends of a connection and can enforce mTLS. Use JWT-SVIDs when you need to pass identity through an application layer — an API gateway, an event bus, or a cross-cluster boundary where TLS termination happens before your service sees the request.</p>
-        </div>
-
-        <h2>What SPIRE is</h2>
-
-        <p>SPIRE (the SPIFFE Runtime Environment) is the reference implementation of SPIFFE. Where SPIFFE defines the standards, SPIRE implements them. SPIRE has two components: a SPIRE Server and SPIRE Agents that run on each node in your infrastructure.</p>
-
-        <p>The SPIRE Server is the certificate authority for a trust domain. It issues SVIDs, manages signing keys, and maintains the registration entries that map workload attributes to SPIFFE IDs. The SPIRE Agent runs on each node and handles workload attestation locally — it contacts the server on behalf of workloads, fetches their SVIDs, and exposes them via a local Workload API socket.</p>
-
-        <p><strong>Workload attestation</strong> is the mechanism that makes this trustworthy. When a workload requests its SVID, the agent does not simply hand over credentials. It interrogates the workload using node-specific attestors — examining kernel metadata, cgroup membership, Kubernetes pod annotations, or platform attestation APIs. The server also performs node attestation when agents register, confirming that the node itself is what it claims to be. The result is identity that is derived from verifiable infrastructure properties, not from a secret the workload was handed at boot.</p>
-
-        <h2>Trust domains and federation</h2>
-
-        <p>A trust domain is the boundary within which a single SPIRE Server (or cluster of servers) is authoritative. Within a trust domain, SVIDs are automatically trusted. Across trust domains — different environments, different organizations, different cloud accounts — you need federation.</p>
-
-        <p>SPIFFE federation works by exchanging trust bundles: the set of root certificates that a trust domain uses to sign its SVIDs. If Trust Domain A trusts Trust Domain B's bundle, then B's SVIDs are valid in A's systems. Federation can be configured statically or via the SPIFFE Federation endpoint, which lets trust bundles refresh automatically as signing keys rotate.</p>
-
-        <div class="key-finding">
-          <div class="kf-label">Why this matters at scale</div>
-          <p>In a multi-cloud or multi-team AI system, federation is the mechanism that lets an agent provisioned in one environment call a service in another without static credentials crossing the boundary. The identity proof travels with the workload rather than being managed out-of-band.</p>
-        </div>
-
-        <h2>Why this matters for agentic AI</h2>
-
-        <p>AI agents introduce a new class of non-human principal. They are not service accounts tied to a specific server. They may be instantiated dynamically, run in ephemeral containers, spawn subagents, and act across multiple trust domains in the course of a single task. The identity model that most organizations use for service accounts — static credentials stored in a secrets manager — was not designed for this pattern. Static credentials do not automatically expire when an agent task completes. They do not carry proof of what infrastructure context the agent is running in. And they do not compose well when one agent spawns another.</p>
-
-        <p>SPIFFE addresses all three problems. SVIDs are short-lived and automatically rotated by SPIRE. They are derived from attestable infrastructure properties, so they carry proof of context. And because SPIFFE IDs are hierarchically structured URIs, they can encode agent lineage — an orchestrator's spawned subagent can carry an SPIFFE ID that encodes its relationship to the parent.</p>
-
-        <div class="callout">
-          <div class="callout-label">Connection to DIRA</div>
-          <p>SPIFFE answers the question <em>who is this workload?</em> It provides cryptographic, attestable identity at the infrastructure layer. DIRA asks the next question: <em>given who this agent is, what is it actually trying to accomplish right now?</em> SPIFFE establishes the subject. DIRA evaluates the intent. Together they form the foundation of a runtime authorization model that can keep pace with agentic AI behavior.</p>
-        </div>
-
-        <p>The practical implication is that any serious non-human identity architecture for AI agents should treat SPIFFE/SPIRE not as an optional hardening layer but as the baseline identity substrate — the thing everything else builds on. Vendor-specific agent identity solutions are proliferating, but they are not interoperable and they do not compose across trust domains. SPIFFE is the standard that makes composition possible.</p>
-
       </section>
 
       <!-- ─── Updates ─── -->
@@ -707,6 +621,10 @@
           <li>
             <span class="update-meta">2026-06-16 <span class="update-tag">Harnesses</span></span>
             <span class="update-text">AI Evaluation Harness Explainer published — 200/300/400 levels, pipeline architecture, agentic evaluation patterns</span>
+          </li>
+          <li>
+            <span class="update-meta">2026-06-25 <span class="update-tag">SPIFFE</span></span>
+            <span class="update-text">SPIFFE/SPIRE and Workload Identity explainer published as standalone property at spiffe.cyberdaemon.ai — SVIDs, attestation, federation, AI agent implementation patterns</span>
           </li>
           <li>
             <span class="update-meta">2026-06-16 <span class="update-tag">Platform</span></span>
